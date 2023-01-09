@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           onPressed: (){
             setState(() {
-              Uri url=Uri.parse("https://www.google.com/search?q=qr+codes&sxsrf=AJOqlzWFN7GU1aoW3Vxjuz-b_fZzEzQesA:1673266921736&source=lnms&tbm=isch&sa=X&ved=2ahUKEwih3--Dvbr8AhXxlosKHQb0CBgQ_AUoAXoECAEQAw&biw=1366&bih=625&dpr=1#imgrc=tyIRyD8TqAYw_M");
+              Uri url=Uri.parse("${barcode!.code}");
               launchUrl(url);
             });
           },
