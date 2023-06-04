@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
       controller?.resumeCamera();
       timer.cancel();
     });
-
+    funk();
     super.initState();
   }
 
@@ -89,9 +89,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
  //2
+  bool a = true;
   Widget buildGalery() {
     return MaterialButton(
-      onPressed: (){},
+      onPressed: (){
+        setState(() {
+          a=!a;
+          a?controller!.resumeCamera():controller!.dispose();
+        });
+      },
       padding: EdgeInsets.zero,
       minWidth: 30,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
@@ -106,8 +112,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildDataPageButton() {
     return  MaterialButton(
-      onPressed: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => UrlData(urlData: data),));
+      onPressed: () async {
+        controller?.dispose();
+        await Navigator.push(context, MaterialPageRoute(builder: (context) => UrlData(urlData: data),));
+        controller!.resumeCamera();
       },
       padding: EdgeInsets.zero,
       minWidth: 30,
@@ -171,10 +179,13 @@ class _HomePageState extends State<HomePage> {
     if (barcode?.code != null && !(data.contains((barcode?.code).toString()))) {
       data.add((barcode?.code).toString());
     }
-    PrefsService.storeData(data);
+    List? list = [];
     PrefsService.loadData().then((value) => {
-      print(value)
+      list = value
     });
+    // PrefsService.storeData(data);
+    print(list);
+    print(data);
   }
 }
 
