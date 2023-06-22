@@ -77,8 +77,6 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  //builder QR scaner widgets
-  //1
   Widget buildQRView() {
     return QRView(
       key: qrKey,
