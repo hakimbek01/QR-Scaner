@@ -95,7 +95,6 @@ class _HomePageState extends State<HomePage> {
 
 
 
- //3
   Widget buildResuld() {
     return Column(
       children: [
@@ -132,7 +131,7 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
- //4
+
   void onQRView(QRViewController controller) {
     setState(() {
       this.controller=controller;
