@@ -1,14 +1,14 @@
 import 'dart:async';
+import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:qrcodescaner/pages/data_url_page.dart';
-import 'package:qrcodescaner/service/prefs_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -21,20 +21,13 @@ class _HomePageState extends State<HomePage> {
   final qrKey=GlobalKey(debugLabel: "QR");
   QRViewController? controller;
   bool code=false;
-  Timer? timer;
   double witdh=0;
   List<String> data =[];
-
+  bool isFlash = false;
 
   @override
-  void initState() {
-    code=true;
-    controller?.dispose();
-    timer=Timer.periodic(Duration(seconds: 1), (timer) {
-      controller?.resumeCamera();
-      timer.cancel();
-    });
-    funk();
+  void initState(){
+    initial();
     super.initState();
   }
 
@@ -42,6 +35,13 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     controller?.dispose();
     super.dispose();
+  }
+
+  void initial() async {
+    code=true;
+    controller?.dispose();
+    await Future.delayed(Duration(seconds: 1));
+    controller?.resumeCamera();
   }
 
   @override
@@ -52,14 +52,18 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.center,
           children: [
             buildQRView(),
-            Positioned(
-              top: 20,
-              child: Row(
-                children: [
-                  buildGalery(),
-                  SizedBox(width: 15,),
-                  buildDataPageButton()
-                ],
+            Align(
+              alignment: Alignment.topCenter,
+              child: MaterialButton(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                onPressed: () {
+                  setState(() {
+                    isFlash = !isFlash;
+                    controller?.toggleFlash();
+                  });
+                },
+                child: isFlash?Icon(CupertinoIcons.lightbulb_fill,color: Colors.yellow,):Icon(CupertinoIcons.lightbulb_slash_fill),
               ),
             ),
             Positioned(
@@ -88,46 +92,9 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
- //2
-  bool a = true;
-  Widget buildGalery() {
-    return MaterialButton(
-      onPressed: (){
-        setState(() {
-          a=!a;
-          a?controller!.resumeCamera():controller!.dispose();
-        });
-      },
-      padding: EdgeInsets.zero,
-      minWidth: 30,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
-      clipBehavior: Clip.hardEdge,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15,vertical: 15),
-        color: Colors.white30,
-        child: Icon(CupertinoIcons.photo_fill,color: Colors.white,)
-      ),
-    );
-  }
 
-  Widget buildDataPageButton() {
-    return  MaterialButton(
-      onPressed: () async {
-        controller?.dispose();
-        await Navigator.push(context, MaterialPageRoute(builder: (context) => UrlData(urlData: data),));
-        controller!.resumeCamera();
-      },
-      padding: EdgeInsets.zero,
-      minWidth: 30,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
-      clipBehavior: Clip.hardEdge,
-      child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 15,vertical: 15),
-          color: Colors.white30,
-          child: Icon(CupertinoIcons.calendar_today,color: Colors.white,)
-      ),
-    );
-  }
+
+
  //3
   Widget buildResuld() {
     return Column(
@@ -136,19 +103,21 @@ class _HomePageState extends State<HomePage> {
           width: MediaQuery.of(context).size.width-40,
           padding: EdgeInsets.all(7),
           decoration: BoxDecoration(
-              color: Colors.white30,
-              borderRadius: BorderRadius.circular(5)
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(color: Colors.white.withOpacity(.3),blurRadius: 7,spreadRadius: 2)
+            ]
           ),
           child: Text(
             barcode!=null?"Natija: ${barcode!.code}":"Scaner kodi",
             maxLines: 2,
-            style: TextStyle(color: Colors.white,overflow: TextOverflow.ellipsis),
+            style: TextStyle(color: Colors.black,overflow: TextOverflow.ellipsis),
           ),
         ),
         MaterialButton(
           padding: EdgeInsets.zero,
           onPressed: (){
-            funk();
             setState(() {
               Uri url=Uri.parse("${barcode!.code}");
               launchUrl(url);
@@ -156,9 +125,9 @@ class _HomePageState extends State<HomePage> {
             });
           },
           minWidth: 200,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          color: Colors.white30,
-          child: Text("Open",style: TextStyle(color: Colors.white),),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          color: Colors.white,
+          child: Text("Open",style: TextStyle(color: Colors.black),),
         ),
       ],
     );
@@ -174,19 +143,6 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  //data url save func
-  void funk (){
-    if (barcode?.code != null && !(data.contains((barcode?.code).toString()))) {
-      data.add((barcode?.code).toString());
-    }
-    List? list = [];
-    PrefsService.loadData().then((value) => {
-      list = value
-    });
-    // PrefsService.storeData(data);
-    print(list);
-    print(data);
-  }
 }
 
 

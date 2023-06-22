@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qrcodescaner/pages/data_url_page.dart';
 import 'package:qrcodescaner/pages/home_page.dart';
 
 
